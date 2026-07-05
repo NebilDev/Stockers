@@ -1,0 +1,28 @@
+{
+  "name": "stockers-backend",
+  "version": "1.0.0",
+  "description": "Stockers is an AI-powered business management system designed for small and medium businesses.",
+  "homepage": "https://github.com/NebilDev/Stockers#readme",
+  "bugs": {
+    "url": "https://github.com/NebilDev/Stockers/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NebilDev/Stockers.git"
+  },
+  "license": "ISC",
+  "author": "NebilDev",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
