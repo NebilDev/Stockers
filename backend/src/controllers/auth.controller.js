@@ -3,7 +3,7 @@ import {
   createEmployee,
 } from "../models/employee.model.js";
 import bcrypt from "bcrypt";
-
+import tokenGenerator from "../utils/tokenGenerator.js";
 const registerEmployee = async (req, res) => {
   try {
     //recieve request data
@@ -53,16 +53,30 @@ const loginEmployee = async (req, res) => {
     const employee = await findEmployeeByUsername(username);
     if (!employee)
       return res.status(401).json({ message: "Invalid credentials" });
-
     //check password
     const validPassword = await bcrypt.compare(password, employee.password);
     if (!validPassword)
       return res.status(401).json({ message: "Invalid credentials" });
 
+    const token = tokenGenerator(employee.id, employee.role);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
     return res.status(200).json({ message: "Logged in successfully!" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-export { registerEmployee, loginEmployee };
+
+const logoutEmployee = async (req, res) => {
+  res.clearCookie("token");
+
+  res.status(200).json({
+    message: "Logged out successfully",
+  });
+};
+export { registerEmployee, loginEmployee, logoutEmployee };
