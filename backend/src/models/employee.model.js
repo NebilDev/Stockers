@@ -21,4 +21,13 @@ const createEmployee = async ({
   return result;
 };
 
-export { findEmployeeByUsername, createEmployee };
+const findEmployeeById = async (id) => {
+  //get employee by id
+  const [rows] = await db.query(
+    " SELECT first_name, last_name, username, role FROM employees WHERE id= ?",
+    [id],
+  );
+  return rows[0] || null;
+};
+
+export { findEmployeeByUsername, createEmployee, findEmployeeById };

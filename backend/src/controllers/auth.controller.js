@@ -1,6 +1,7 @@
 import {
   findEmployeeByUsername,
   createEmployee,
+  findEmployeeById,
 } from "../models/employee.model.js";
 import bcrypt from "bcrypt";
 import tokenGenerator from "../utils/tokenGenerator.js";
@@ -11,7 +12,7 @@ const registerEmployee = async (req, res) => {
 
     //validate data
     if (!first_name || !last_name || !username || !role || !password)
-      return res.status(400).json({ message: "All fields are requires!" });
+      return res.status(400).json({ message: "All fields are required!" });
     if (password.length > 50)
       return res.status(400).json({ message: "Password too long!" });
     if (password.length < 6)
@@ -36,7 +37,9 @@ const registerEmployee = async (req, res) => {
     return res.status(201).json({ message: "Employee created successfully!" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", employeeId: result.insertId });
   }
 };
 
@@ -61,11 +64,13 @@ const loginEmployee = async (req, res) => {
     const token = tokenGenerator(employee.id, employee.role);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-    return res.status(200).json({ message: "Logged in successfully!" });
+    return res
+      .status(200)
+      .json({ message: "Logged in successfully!", employee });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -73,10 +78,26 @@ const loginEmployee = async (req, res) => {
 };
 
 const logoutEmployee = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
 
   res.status(200).json({
     message: "Logged out successfully",
   });
 };
-export { registerEmployee, loginEmployee, logoutEmployee };
+
+const getEmployee = async (req, res) => {
+  try {
+    const employee = await findEmployeeById(req.user.id);
+    if (!employee)
+      return res.status(404).json({ message: "Resource not found" });
+    return res.status(200).json({ message: "Employee found!", employee });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Inernal server error" });
+  }
+};
+export { registerEmployee, loginEmployee, logoutEmployee, getEmployee };
