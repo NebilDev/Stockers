@@ -1,9 +1,10 @@
 import db from "../config/database.js";
 
 const findProductByModel = async (model) => {
-  const [rows] = await db.query("SELECT * FROM products WHERE model = ?", [
-    model,
-  ]);
+  const [rows] = await db.query(
+    "SELECT id, catagory, brand, model FROM products WHERE model = ?",
+    [model],
+  );
   return rows[0] || null;
 };
 
