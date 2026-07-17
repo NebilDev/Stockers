@@ -32,4 +32,11 @@ const createProduct = async ({
 
   return result;
 };
-export { findProductByModel, createProduct };
+
+const findProducts = async ({ limit, offset }) => {
+  const [rows] = await db.query(
+    `SELECT id, category, brand, model, buying_price, selling_price quantity FROM products ORDER BY brand LIMIT ${limit} OFFSET ${offset}`,
+  );
+  return rows[0] || null;
+};
+export { findProductByModel, createProduct, findProducts };
